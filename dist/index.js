@@ -32006,6 +32006,12 @@ function getSource(settings) {
                 core.startGroup('Setting up auth for fetching submodules');
                 yield authHelper.configureGlobalAuth();
                 core.endGroup();
+                // Clean any existing submodules first
+                if (settings.clean) {
+                    core.startGroup('Cleaning submodules');
+                    yield git.submoduleForeach('git clean -ffdx', settings.nestedSubmodules);
+                    core.endGroup();
+                }
                 // Checkout submodules
                 core.startGroup('Fetching submodules');
                 yield git.submoduleSync(settings.nestedSubmodules);
