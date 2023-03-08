@@ -30,6 +30,11 @@ export interface IGitSourceSettings {
   clean: boolean
 
   /**
+   * Indicates whether to restore the last modification time of the files in the repository based on the date of the most recent commit that modified them
+   */
+  restoreMtime: boolean
+
+  /**
    * The depth when fetching
    */
   fetchDepth: number

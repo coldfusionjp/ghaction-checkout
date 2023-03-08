@@ -18515,8 +18515,13 @@ function getInputs() {
         // Clean
         result.clean = (core.getInput('clean') || 'true').toUpperCase() === 'TRUE';
         core.debug(`clean = ${result.clean}`);
+        // Restore last modified timestamp
+        result.restoreMtime =
+            (core.getInput('restore-mtime') || 'false').toUpperCase() === 'TRUE';
+        core.debug(`restore mtime = ${result.restoreMtime}`);
         // Fetch depth
-        result.fetchDepth = Math.floor(Number(core.getInput('fetch-depth') || '1'));
+        const defaultFetchDepth = result.restoreMtime === true ? '0' : '1';
+        result.fetchDepth = Math.floor(Number(core.getInput('fetch-depth') || defaultFetchDepth));
         if (isNaN(result.fetchDepth) || result.fetchDepth < 0) {
             result.fetchDepth = 0;
         }
@@ -31865,6 +31870,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanup = exports.getSource = void 0;
 const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
 const fsHelper = __importStar(__webpack_require__(618));
 const gitAuthHelper = __importStar(__webpack_require__(287));
 const gitCommandManager = __importStar(__webpack_require__(289));
@@ -32000,6 +32006,12 @@ function getSource(settings) {
             core.startGroup('Checking out the ref');
             yield git.checkout(checkoutInfo.ref, checkoutInfo.startPoint);
             core.endGroup();
+            // Restore last modified timestamps
+            if (settings.restoreMtime) {
+                core.startGroup('Restoring last modified timestamps');
+                yield gitRestoreMtime(git.getWorkingDirectory());
+                core.endGroup();
+            }
             // Submodules
             if (settings.submodules) {
                 // Temporarily override global config
@@ -32018,6 +32030,12 @@ function getSource(settings) {
                 yield git.submoduleUpdate(settings.fetchDepth, settings.nestedSubmodules);
                 yield git.submoduleForeach('git config --local gc.auto 0', settings.nestedSubmodules);
                 core.endGroup();
+                // Restore last modified timestamps
+                if (settings.restoreMtime) {
+                    core.startGroup('Restoring last modified timestamps for submodules');
+                    yield git.submoduleForeach(getGitRestoreMtimeCommand().join(' '), settings.nestedSubmodules);
+                    core.endGroup();
+                }
                 // Persist credentials
                 if (settings.persistCredentials) {
                     core.startGroup('Persisting credentials for submodules');
@@ -32096,6 +32114,37 @@ function getGitCommandManager(settings) {
             // Otherwise fallback to REST API
             return undefined;
         }
+    });
+}
+function getGitRestoreMtimeCommand() {
+    return [path.join(__dirname, 'git-restore-mtime.py')];
+}
+function gitRestoreMtime(cwd, allowAllExitCodes = false, silent = false, customListeners = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        fsHelper.directoryExistsSync(cwd, true);
+        const env = {};
+        for (const key of Object.keys(process.env)) {
+            env[key] = process.env[key];
+        }
+        const defaultListener = {
+            stdout: (data) => {
+                stdout.push(data.toString());
+            }
+        };
+        const mergedListeners = Object.assign(Object.assign({}, defaultListener), customListeners);
+        const stdout = [];
+        const options = {
+            cwd: cwd,
+            env,
+            silent,
+            ignoreReturnCode: allowAllExitCodes,
+            listeners: mergedListeners
+        };
+        const cmd = getGitRestoreMtimeCommand();
+        const exitCode = yield exec.exec(cmd[0], cmd.slice(1), options);
+        const result = stdout.join('');
+        core.debug(exitCode.toString());
+        core.debug(result);
     });
 }
 

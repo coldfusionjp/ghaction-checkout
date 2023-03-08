@@ -74,6 +74,29 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
     # Default: true
     clean: ''
 
+    # Whether to restore the last modification time of the files in the repository
+    # based on the date of the most recent commit that modified them.
+    #
+    # Enabling this feature is useful in CI/CD environments where files may be
+    # incorrectly identified as being modified when they are not, preventing
+    # incremental builds from working as expected. Git does not preserve the original
+    # timestamp of committed files, and whenever repositories are cloned, or
+    # branches/files are checked out, file timestamps are reset to the current date.
+    # This feature will reset the timestamp of the file to the date of the most recent
+    # commit where it was last modified, providing a consistent timestamp necessary
+    # for incremental builds.
+    #
+    # Restoring the last modification time is also automatically performed for
+    # submodules as desired, based on the submodules setting.
+    #
+    # In order to properly restore the last modification time of files in the
+    # repository, the full history (a deep clone) is required. When `restore-mtime` is
+    # enabled, `fetch-depth` will instead default to `0` to fetch the complete history
+    # (however, this can be overridden if desired).
+    #
+    # Default: false
+    restore-mtime: ''
+
     # Number of commits to fetch. 0 indicates all history for all branches and tags.
     # Default: 1
     fetch-depth: ''

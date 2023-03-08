@@ -82,8 +82,16 @@ export async function getInputs(): Promise<IGitSourceSettings> {
   result.clean = (core.getInput('clean') || 'true').toUpperCase() === 'TRUE'
   core.debug(`clean = ${result.clean}`)
 
+  // Restore last modified timestamp
+  result.restoreMtime =
+    (core.getInput('restore-mtime') || 'false').toUpperCase() === 'TRUE'
+  core.debug(`restore mtime = ${result.restoreMtime}`)
+
   // Fetch depth
-  result.fetchDepth = Math.floor(Number(core.getInput('fetch-depth') || '1'))
+  const defaultFetchDepth = result.restoreMtime === true ? '0' : '1'
+  result.fetchDepth = Math.floor(
+    Number(core.getInput('fetch-depth') || defaultFetchDepth)
+  )
   if (isNaN(result.fetchDepth) || result.fetchDepth < 0) {
     result.fetchDepth = 0
   }

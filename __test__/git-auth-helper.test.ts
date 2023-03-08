@@ -797,6 +797,7 @@ async function setup(testName: string): Promise<void> {
     authToken: 'some auth token',
     clean: true,
     commit: '',
+    restoreMtime: false,
     fetchDepth: 1,
     lfs: false,
     submodules: false,

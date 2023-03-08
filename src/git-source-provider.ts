@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as exec from '@actions/exec'
 import * as fsHelper from './fs-helper'
 import * as gitAuthHelper from './git-auth-helper'
 import * as gitCommandManager from './git-command-manager'
@@ -196,6 +197,13 @@ export async function getSource(settings: IGitSourceSettings): Promise<void> {
     await git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
     core.endGroup()
 
+    // Restore last modified timestamps
+    if (settings.restoreMtime) {
+      core.startGroup('Restoring last modified timestamps')
+      await gitRestoreMtime(git.getWorkingDirectory())
+      core.endGroup()
+    }
+
     // Submodules
     if (settings.submodules) {
       // Temporarily override global config
@@ -219,6 +227,16 @@ export async function getSource(settings: IGitSourceSettings): Promise<void> {
         settings.nestedSubmodules
       )
       core.endGroup()
+
+      // Restore last modified timestamps
+      if (settings.restoreMtime) {
+        core.startGroup('Restoring last modified timestamps for submodules')
+        await git.submoduleForeach(
+          getGitRestoreMtimeCommand().join(' '),
+          settings.nestedSubmodules
+        )
+        core.endGroup()
+      }
 
       // Persist credentials
       if (settings.persistCredentials) {
@@ -315,4 +333,46 @@ async function getGitCommandManager(
     // Otherwise fallback to REST API
     return undefined
   }
+}
+
+function getGitRestoreMtimeCommand(): string[] {
+  return [path.join(__dirname, 'git-restore-mtime.py')]
+}
+
+async function gitRestoreMtime(
+  cwd: string,
+  allowAllExitCodes = false,
+  silent = false,
+  customListeners = {}
+): Promise<void> {
+  fsHelper.directoryExistsSync(cwd, true)
+
+  const env = {}
+  for (const key of Object.keys(process.env)) {
+    env[key] = process.env[key]
+  }
+
+  const defaultListener = {
+    stdout: (data: Buffer) => {
+      stdout.push(data.toString())
+    }
+  }
+
+  const mergedListeners = {...defaultListener, ...customListeners}
+
+  const stdout: string[] = []
+  const options = {
+    cwd: cwd,
+    env,
+    silent,
+    ignoreReturnCode: allowAllExitCodes,
+    listeners: mergedListeners
+  }
+
+  const cmd = getGitRestoreMtimeCommand()
+  const exitCode = await exec.exec(cmd[0], cmd.slice(1), options)
+  const result = stdout.join('')
+
+  core.debug(exitCode.toString())
+  core.debug(result)
 }
