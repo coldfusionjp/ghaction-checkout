@@ -1,5 +1,8 @@
-name: 'Checkout'
-description: 'Checkout a Git repository at a particular version'
+name: 'CheckoutPlus'
+description: "Checkout Plus is an improved version of GitHub's actions/checkout, with extra features to simplify your build pipelines."
+branding:
+  icon: 'git-branch'
+  color: 'blue'
 inputs:
   repository:
     description: 'Repository name with owner. For example, coldfusionjp/ghaction-checkout-plus'
