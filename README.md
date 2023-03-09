@@ -1,4 +1,4 @@
-# Checkout Plus
+# <img src="https://user-images.githubusercontent.com/532282/224029974-12e400ab-3f3c-4579-8671-abf337a6dcaf.png" alt="Checkout Plus Logo" width="640" />
 
 Checkout Plus is a GitHub Action based on GitHub's [actions/checkout](https://github.com/actions/checkout) action, with extra features added to simplify your build pipelines.  Checkout Plus maintains full compatibility with [actions/checkout](https://github.com/actions/checkout) and can be easily used as a drop-in replacement.
 
