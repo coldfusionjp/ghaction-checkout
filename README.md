@@ -19,7 +19,7 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 
 <!-- start usage -->
 ```yaml
-- uses: actions/checkout@v3
+- uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     # Repository name with owner. For example, actions/checkout
     # Default: ${{ github.repository }}
