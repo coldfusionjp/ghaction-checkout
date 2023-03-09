@@ -1,7 +1,7 @@
 {
-  "name": "checkout",
-  "version": "3.2.0",
-  "description": "checkout action",
+  "name": "checkout-plus",
+  "version": "3.3.0",
+  "description": "Checkout Plus action",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc && ncc build && node lib/misc/generate-docs.js",
@@ -14,19 +14,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/checkout.git"
+    "url": "git+https://github.com/coldfusionjp/ghaction-checkout-plus"
   },
   "keywords": [
-    "github",
     "actions",
-    "checkout"
+    "ci-cd"
   ],
-  "author": "GitHub",
+  "author": "Cold Fusion, GitHub, and contributors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/actions/checkout/issues"
+    "url": "https://github.com/coldfusionjp/ghaction-checkout-plus/issues"
   },
-  "homepage": "https://github.com/actions/checkout#readme",
+  "homepage": "https://github.com/coldfusionjp/ghaction-checkout-plus#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.0.1",

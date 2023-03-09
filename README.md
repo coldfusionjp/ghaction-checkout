@@ -1,27 +1,54 @@
-[![Build and Test](https://github.com/actions/checkout/actions/workflows/test.yml/badge.svg)](https://github.com/actions/checkout/actions/workflows/test.yml)
+# Checkout Plus
 
-# Checkout V3
+Checkout Plus is a GitHub Action based on GitHub's [actions/checkout](https://github.com/actions/checkout) action, with extra features added to simplify your build pipelines.  Checkout Plus maintains full compatibility with [actions/checkout](https://github.com/actions/checkout) and can be easily used as a drop-in replacement.
 
-This action checks-out your repository under `$GITHUB_WORKSPACE`, so your workflow can access it.
+To avoid confusion with differing version numbers, Checkout Plus follows the same versioning as [actions/checkout](https://github.com/actions/checkout) (beginning with v3.3.0), and this fork will integrate any new changes whenever a new release is made there.
 
-Only a single commit is fetched by default, for the ref/SHA that triggered the workflow. Set `fetch-depth: 0` to fetch all history for all branches and tags. Refer [here](https://help.github.com/en/articles/events-that-trigger-workflows) to learn which commit `$GITHUB_SHA` points to for different events.
+Development on Checkout Plus is provided and supported by [Cold Fusion](https://github.com/coldfusionjp), and we actively use it for all of our CI/CD pipelines here on GitHub.
 
-The auth token is persisted in the local git config. This enables your scripts to run authenticated git commands. The token is removed during post-job cleanup. Set `persist-credentials: false` to opt-out.
+[![Build and Test](https://github.com/coldfusionjp/ghaction-checkout-plus/actions/workflows/test.yml/badge.svg)](https://github.com/coldfusionjp/ghaction-checkout-plus/actions/workflows/test.yml)
 
-When Git 2.18 or higher is not in your PATH, falls back to the REST API to download the files.
+# Added Features
 
-# What's new
+- Restore last modified timestamps
+  > Useful for incremental builds, enabling `restore-mtime` will ensure the timestamps of the files in your repository are consistently reset to the time of the commit they were last modified in after a clone/fetch.  `restore-mtime` is fast even on large repositories, capable of processing 100K files in less than 8 seconds, and works with submodules as well!
 
-- Updated to the node16 runtime by default
-  - This requires a minimum [Actions Runner](https://github.com/actions/runner/releases/tag/v2.285.0) version of v2.285.0 to run, which is by default available in GHES 3.4 or later.
+- Cleaning of submodules
+  > The default GitHub checkout action has a long-standing open issue ([actions/checkout#358](https://github.com/actions/checkout/issues/358)) where it does not perform a `git clean` on any submodules.  Checkout Plus will automatically recursively iterate (as desired) into your repository's submodules and run `git clean` on them when both `clean: true` is set and `submodules` is set to either `true` or `recursive`.
 
-# Usage
+# Quickstart
+
+## New Builders
+
+If you are new to GitHub Actions, simply create an actions .yaml, and add the following line to it:
+
+```
+- uses: coldfusionjp/ghaction-checkout-plus@v3
+```
+
+## Existing Checkout Action Builders
+
+If you are already using GitHub's provided [actions/checkout](https://github.com/actions/checkout) action, simply change the following line in your actions .yaml:
+
+```
+- uses: actions/checkout@v3
+```
+
+to be:
+
+```
+- uses: coldfusionjp/ghaction-checkout-plus@v3
+```
+
+Any parameters which are passed to [actions/checkout](https://github.com/actions/checkout) can continue to be used as-is with Checkout Plus.
+
+# Detailed Usage
 
 <!-- start usage -->
 ```yaml
 - uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
-    # Repository name with owner. For example, actions/checkout
+    # Repository name with owner. For example, coldfusionjp/ghaction-checkout-plus
     # Default: ${{ github.repository }}
     repository: ''
 
@@ -37,7 +64,8 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
     # We recommend using a service account with the least permissions necessary. Also
     # when generating a new PAT, select the least scopes necessary.
     #
-    # [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+    # Learn more about creating and using encrypted secrets:
+    # - https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets
     #
     # Default: ${{ github.token }}
     token: ''
@@ -48,7 +76,8 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
     #
     # We recommend using a service account with the least permissions necessary.
     #
-    # [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+    # Learn more about creating and using encrypted secrets:
+    # - https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets
     ssh-key: ''
 
     # Known hosts in addition to the user and global host key database. The public SSH
@@ -142,7 +171,7 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 ## Fetch all history for all tags and branches
 
 ```yaml
-- uses: actions/checkout@v3
+- uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     fetch-depth: 0
 ```
@@ -150,7 +179,7 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 ## Checkout a different branch
 
 ```yaml
-- uses: actions/checkout@v3
+- uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     ref: my-branch
 ```
@@ -158,7 +187,7 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 ## Checkout HEAD^
 
 ```yaml
-- uses: actions/checkout@v3
+- uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     fetch-depth: 2
 - run: git checkout HEAD^
@@ -168,12 +197,12 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 
 ```yaml
 - name: Checkout
-  uses: actions/checkout@v3
+  uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     path: main
 
 - name: Checkout tools repo
-  uses: actions/checkout@v3
+  uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     repository: my-org/my-tools
     path: my-tools
@@ -184,10 +213,10 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 
 ```yaml
 - name: Checkout
-  uses: actions/checkout@v3
+  uses: coldfusionjp/ghaction-checkout-plus@v3
 
 - name: Checkout tools repo
-  uses: actions/checkout@v3
+  uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     repository: my-org/my-tools
     path: my-tools
@@ -198,12 +227,12 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 
 ```yaml
 - name: Checkout
-  uses: actions/checkout@v3
+  uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     path: main
 
 - name: Checkout private tools
-  uses: actions/checkout@v3
+  uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     repository: my-org/my-private-tools
     token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains your PAT
@@ -216,7 +245,7 @@ When Git 2.18 or higher is not in your PATH, falls back to the REST API to downl
 ## Checkout pull request HEAD commit instead of merge commit
 
 ```yaml
-- uses: actions/checkout@v3
+- uses: coldfusionjp/ghaction-checkout-plus@v3
   with:
     ref: ${{ github.event.pull_request.head.sha }}
 ```
@@ -232,7 +261,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: coldfusionjp/ghaction-checkout-plus@v3
 ```
 
 ## Push a commit using the built-in token
@@ -243,7 +272,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: coldfusionjp/ghaction-checkout-plus@v3
       - run: |
           date > generated.txt
           git config user.name github-actions
@@ -255,4 +284,4 @@ jobs:
 
 # License
 
-The scripts and documentation in this project are released under the [MIT License](LICENSE)
+While the scripts and documentation specific to this project are released under the [MIT License](LICENSE), this project integrates components from other projects which use different liceneses.  Please see the included [NOTICE](NOTICE.md) for full details.

@@ -2,7 +2,7 @@ name: 'Checkout'
 description: 'Checkout a Git repository at a particular version'
 inputs:
   repository:
-    description: 'Repository name with owner. For example, actions/checkout'
+    description: 'Repository name with owner. For example, coldfusionjp/ghaction-checkout-plus'
     default: ${{ github.repository }}
   ref:
     description: >
@@ -20,7 +20,9 @@ inputs:
       Also when generating a new PAT, select the least scopes necessary.
 
 
-      [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+      Learn more about creating and using encrypted secrets:
+
+      - https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets
     default: ${{ github.token }}
   ssh-key:
     description: >
@@ -32,8 +34,9 @@ inputs:
       We recommend using a service account with the least permissions necessary.
 
 
-      [Learn more about creating and using
-      encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+      Learn more about creating and using encrypted secrets:
+
+      - https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets
   ssh-known-hosts:
     description: >
       Known hosts in addition to the user and global host key database. The public
