@@ -284,4 +284,4 @@ jobs:
 
 # License
 
-While the scripts and documentation specific to this project are released under the [MIT License](LICENSE), this project integrates components from other projects which use different liceneses.  Please see the included [NOTICE](NOTICE.md) for full details.
+While the scripts and documentation specific to this project are released under the [MIT License](LICENSE), this project integrates components from other projects which use different licenses.  Please see the included [NOTICE](NOTICE.md) for full details.
