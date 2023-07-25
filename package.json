@@ -1,6 +1,6 @@
 {
   "name": "checkout-plus",
-  "version": "3.5.2",
+  "version": "3.5.3",
   "description": "Checkout Plus action",
   "main": "lib/main.js",
   "scripts": {

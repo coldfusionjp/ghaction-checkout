@@ -126,6 +126,15 @@ Any parameters which are passed to [actions/checkout](https://github.com/actions
     # Default: false
     restore-mtime: ''
 
+    # Do a sparse checkout on given patterns. Each pattern should be separated with
+    # new lines
+    # Default: null
+    sparse-checkout: ''
+
+    # Specifies whether to use cone-mode when doing a sparse checkout.
+    # Default: true
+    sparse-checkout-cone-mode: ''
+
     # Number of commits to fetch. 0 indicates all history for all branches and tags.
     # Default: 1
     fetch-depth: ''
@@ -158,6 +167,9 @@ Any parameters which are passed to [actions/checkout](https://github.com/actions
 
 # Scenarios
 
+- [Fetch only the root files](#Fetch-only-the-root-files)
+- [Fetch only the root files and `.github` and `src` folder](#Fetch-only-the-root-files-and-github-and-src-folder)
+- [Fetch only a single file](#Fetch-only-a-single-file)
 - [Fetch all history for all tags and branches](#Fetch-all-history-for-all-tags-and-branches)
 - [Checkout a different branch](#Checkout-a-different-branch)
 - [Checkout HEAD^](#Checkout-HEAD)
@@ -167,6 +179,34 @@ Any parameters which are passed to [actions/checkout](https://github.com/actions
 - [Checkout pull request HEAD commit instead of merge commit](#Checkout-pull-request-HEAD-commit-instead-of-merge-commit)
 - [Checkout pull request on closed event](#Checkout-pull-request-on-closed-event)
 - [Push a commit using the built-in token](#Push-a-commit-using-the-built-in-token)
+
+## Fetch only the root files
+
+```yaml
+- uses: actions/checkout@v3
+  with:
+    sparse-checkout: .
+```
+
+## Fetch only the root files and `.github` and `src` folder
+
+```yaml
+- uses: actions/checkout@v3
+  with:
+    sparse-checkout: |
+      .github
+      src
+```
+
+## Fetch only a single file
+
+```yaml
+- uses: actions/checkout@v3
+  with:
+    sparse-checkout: |
+      README.md
+    sparse-checkout-cone-mode: false
+```
 
 ## Fetch all history for all tags and branches
 

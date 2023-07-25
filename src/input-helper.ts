@@ -87,6 +87,17 @@ export async function getInputs(): Promise<IGitSourceSettings> {
     (core.getInput('restore-mtime') || 'false').toUpperCase() === 'TRUE'
   core.debug(`restore mtime = ${result.restoreMtime}`)
 
+  // Sparse checkout
+  const sparseCheckout = core.getMultilineInput('sparse-checkout')
+  if (sparseCheckout.length) {
+    result.sparseCheckout = sparseCheckout
+    core.debug(`sparse checkout = ${result.sparseCheckout}`)
+  }
+
+  result.sparseCheckoutConeMode =
+    (core.getInput('sparse-checkout-cone-mode') || 'true').toUpperCase() ===
+    'TRUE'
+
   // Fetch depth
   const defaultFetchDepth = result.restoreMtime === true ? '0' : '1'
   result.fetchDepth = Math.floor(
